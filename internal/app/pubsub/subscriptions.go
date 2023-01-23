@@ -54,7 +54,7 @@ func (t *pubsubClient) CreateSubscription(subscriptionName, topicName, pushEndpo
 		}
 	}
 
-	if _, err := t.client.CreateSubscription(t.ctx, topicName, subscriptionConfig); err != nil {
+	if _, err := t.client.CreateSubscription(t.ctx, subscriptionName, subscriptionConfig); err != nil {
 		return err
 	}
 	logger.Info("Subscription created: %s", subscriptionName)

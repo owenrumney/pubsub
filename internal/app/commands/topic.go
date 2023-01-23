@@ -50,10 +50,26 @@ var deleteTopicCmd = &cobra.Command{
 	},
 }
 
+var tailTopicCmd = &cobra.Command{
+	Use:   "tail",
+	Short: "Tail a topic",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		psClient, err := pubsub.New(projectID)
+		if err != nil {
+			return err
+		}
+
+		return psClient.TailTopic(topicName, tailDuration)
+	},
+}
+
 func topicsCommand() *cobra.Command {
 	topicsCmd.AddCommand(listTopicsCmd)
 	topicsCmd.AddCommand(createTopicCmd)
 	topicsCmd.AddCommand(deleteTopicCmd)
+	topicsCmd.AddCommand(tailTopicCmd)
+
+	tailTopicCmd.Flags().StringVar(&tailDuration, "tail-duration", "10m", "Duration to tail for (e.g. 30s, 1m, 1h). Default 10min")
 
 	return topicsCmd
 }
