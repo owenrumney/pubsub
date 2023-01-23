@@ -41,7 +41,7 @@ Flags:
 Use "pubsub [command] --help" for more information about a command.
 ```
 
-All commands require a project ID to be set using `-p` or `--project`. If this isn't done, the default `test-project` is used.
+All commands require a project ID to be set using `-p` or `--project`. If this isn't done, the default `test-project` is used. Optionally, you can set the `PROJECT_ID` environment variable to save you the keystrokes.
 
 #### Topics
 
@@ -59,6 +59,7 @@ Available Commands:
   create      Create a topic
   delete      Delete a topic
   list        List topics
+  tail        Tail a topic
 
 Flags:
   -h, --help   help for topics
@@ -88,6 +89,14 @@ pubsub topics create -p my-test-project -t my-topic
 
 ```bash
 pubsub topics delete -p my-test-project -t my-topic
+```
+
+##### Tailing Topics
+
+Default tail is for 10 minutes, this can be changed with the `--tail-duration` flag; use the format `10s` for 10 seconds, `5m` for 5 minutes, `1h` for 1 hour, etc.
+
+```bash
+pubsub topics tail -p my-test-project -t my-topic --tail-duration 5m
 ```
 
 #### Subscriptions
