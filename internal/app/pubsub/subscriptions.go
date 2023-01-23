@@ -62,10 +62,6 @@ func (t *pubsubClient) CreateSubscription(subscriptionName, topicName, pushEndpo
 }
 
 func (t *pubsubClient) DeleteSubscription(subscriptionName string) error {
-	if subscriptionName == "" {
-		return fmt.Errorf("subscription name is required")
-	}
-
 	logger.Debug("Deleting subscription: %s", subscriptionName)
 	subscription := t.client.Subscription(subscriptionName)
 	exists, err := subscription.Exists(t.ctx)

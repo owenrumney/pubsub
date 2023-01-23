@@ -57,8 +57,9 @@ func subscriptionCommand() *cobra.Command {
 
 	createSubscriptionCmd.Flags().StringVarP(&subscriptionName, "sub-name", "s", "", "Subscription name")
 	createSubscriptionCmd.Flags().StringVarP(&pushEndpoint, "push-endpoint", "e", "", "The push endpoint to send messages to")
-
 	createSubscriptionCmd.MarkFlagRequired("topic")
+
+	deleteSubscriptionCmd.Flags().StringVarP(&subscriptionName, "sub-name", "s", "", "Subscription name")
 
 	return subscriptionCmd
 }
