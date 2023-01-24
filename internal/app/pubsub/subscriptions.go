@@ -25,12 +25,12 @@ func (p *pubsubClient) ListSubscriptions() error {
 	}
 }
 
-func (t *pubsubClient) CreateSubscription(subscriptionName, topicName, pushEndpoint string) error {
+func (t *pubsubClient) CreateSubscription(subscriptionName, topicName, pushEndpoint string) (*pubsub.Subscription, error) {
 	if topicName == "" {
-		return fmt.Errorf("topic name is required")
+		return nil, fmt.Errorf("topic name is required")
 	}
 	if subscriptionName == "" {
-		return fmt.Errorf("subscription name is required")
+		return nil, fmt.Errorf("subscription name is required")
 	}
 
 	logger.Debug("Creating subscription: %s", subscriptionName)
@@ -41,7 +41,7 @@ func (t *pubsubClient) CreateSubscription(subscriptionName, topicName, pushEndpo
 	}
 	if exists {
 		logger.Warn("Topic already exists: %s", topicName)
-		return nil
+		return subscription, nil
 	}
 
 	subscriptionConfig := pubsub.SubscriptionConfig{
@@ -54,11 +54,12 @@ func (t *pubsubClient) CreateSubscription(subscriptionName, topicName, pushEndpo
 		}
 	}
 
-	if _, err := t.client.CreateSubscription(t.ctx, subscriptionName, subscriptionConfig); err != nil {
-		return err
+	subscription, err = t.client.CreateSubscription(t.ctx, subscriptionName, subscriptionConfig)
+	if err != nil {
+		return nil, err
 	}
 	logger.Info("Subscription created: %s", subscriptionName)
-	return nil
+	return subscription, nil
 }
 
 func (t *pubsubClient) DeleteSubscription(subscriptionName string) error {

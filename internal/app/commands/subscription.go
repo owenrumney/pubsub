@@ -33,7 +33,8 @@ var createSubscriptionCmd = &cobra.Command{
 			return err
 		}
 
-		return psClient.CreateSubscription(subscriptionName, topicName, pushEndpoint)
+		_, err = psClient.CreateSubscription(subscriptionName, topicName, pushEndpoint)
+		return err
 	},
 }
 
