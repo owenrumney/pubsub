@@ -2,7 +2,9 @@ package pubsub
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 
 	"cloud.google.com/go/pubsub"
@@ -12,10 +14,15 @@ import (
 func (t *pubsubClient) TailTopic(topicName, tailDuration string) error {
 
 	subscriptionName := topicName + "-tail"
-	t.CreateSubscription(subscriptionName, topicName, "")
+	logger.Info("Creating tail subscription: %s", subscriptionName)
+	subscription, err := t.CreateSubscription(subscriptionName, topicName, "")
+	if err != nil {
+		return err
+	}
 
-	subscription := t.client.Subscription(subscriptionName)
-	_, err := subscription.Exists(t.ctx)
+	ctx, cancel := context.WithTimeout(t.ctx, 10*time.Second)
+	defer cancel()
+	_, err = subscription.Exists(ctx)
 	if err != nil {
 		return err
 	}
@@ -27,11 +34,27 @@ func (t *pubsubClient) TailTopic(topicName, tailDuration string) error {
 	}
 
 	logger.Info("Tailing topic: %s for %s", topicName, tailDuration)
-	ctx, cancel := context.WithTimeout(t.ctx, duration)
+	ctx, cancel = context.WithTimeout(t.ctx, duration)
 	defer cancel()
 	return subscription.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
 		msg.Ack()
-		fmt.Println(msg)
-	})
+		eventHeader := fmt.Sprintf("Published: %s ID: %s", msg.PublishTime, msg.ID)
+		fmt.Printf("%s\n%s\n", eventHeader, strings.Repeat("-", len(eventHeader)))
+		for attr, val := range msg.Attributes {
+			fmt.Printf("%s:\t\t%v\n", attr, val)
+		}
 
+		var content map[string]interface{}
+		err := json.Unmarshal(msg.Data, &content)
+		if err != nil {
+			fmt.Printf("%s\n", string(msg.Data))
+		}
+		body, err := json.MarshalIndent(content, "", "  ")
+		if err != nil {
+			logger.Error("Error marshalling message: %v", err)
+			fmt.Printf("%s\n", string(msg.Data))
+		}
+		fmt.Printf("%v\n", string(body))
+	},
+	)
 }
