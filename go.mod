@@ -1,6 +1,6 @@
 module github.com/owenrumney/pubsub
 
-go 1.19
+go 1.26.10
 
 require cloud.google.com/go/pubsub v1.28.0
 
